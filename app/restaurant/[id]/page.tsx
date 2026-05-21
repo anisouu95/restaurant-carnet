@@ -47,6 +47,7 @@ export default function RestaurantPage() {
 
   function handleDelete() {
     if (!confirm("Supprimer ce restaurant ?")) return;
+    if (!restaurant) return;
     remove(restaurant.id);
     router.push("/");
   }
