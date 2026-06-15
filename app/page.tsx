@@ -81,9 +81,20 @@ export default function RecommandationsPage() {
               style={{ backgroundColor: "#ffffff", borderColor: "#e8e0d5" }}
             >
               <div className="relative h-44" style={{ backgroundColor: "#f0ebe4" }}>
-                <div className="w-full h-full flex items-center justify-center">
-                  <span className="text-5xl opacity-20">🍽</span>
-                </div>
+                {place.photos?.[0] ? (
+                  <img
+                    src={`/api/photo?name=${encodeURIComponent(place.photos[0].name)}`}
+                    alt={place.displayName.text}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none";
+                    }}
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <span className="text-5xl opacity-20">🍽</span>
+                  </div>
+                )}
                 {place.rating && (
                   <div className="absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-semibold"
                     style={{ backgroundColor: "#C4A882", color: "#1a1a1a" }}>
