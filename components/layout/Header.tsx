@@ -112,13 +112,7 @@ export function Header() {
                   </div>
                   <span className="hidden sm:block">{user.email?.split("@")[0]}</span>
                 </Link>
-                <button
-                  onClick={handleLogout}
-                  className="px-3 py-2 rounded-lg text-xs font-semibold transition-all"
-                  style={{ backgroundColor: "transparent", color: "#8a8075", border: "1px solid #2a2a2a" }}
-                >
-                  Déco
-                </button>
+
               </div>
             ) : (
               <button
