@@ -11,7 +11,7 @@ export function Header() {
   const navItems = [
     {
       href: "/",
-      label: "Recommandations",
+      label: "Accueil",
       icon: (
         <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
@@ -52,14 +52,12 @@ export function Header() {
       <header style={{ backgroundColor: "#1a1a1a" }} className="sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
 
-          {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
             <span className="font-display text-lg font-bold" style={{ color: "#C4A882" }}>
               DISHLIST
             </span>
           </Link>
 
-          {/* Nav centrale — desktop uniquement */}
           <nav className="hidden sm:flex items-center gap-1">
             {navItems.map(({ href, label, icon }) => {
               const isActive = pathname === href;
@@ -82,7 +80,6 @@ export function Header() {
             })}
           </nav>
 
-          {/* Droite : Connexion + Hamburger mobile */}
           <div className="flex items-center gap-3">
             <button
               className="px-4 py-2 rounded-lg text-sm font-semibold transition-all"
@@ -91,7 +88,6 @@ export function Header() {
               Connexion
             </button>
 
-            {/* Hamburger — mobile uniquement */}
             <button
               className="sm:hidden flex flex-col justify-center items-center gap-1.5 w-9 h-9"
               onClick={() => setSidebarOpen(true)}
@@ -106,57 +102,61 @@ export function Header() {
         </div>
       </header>
 
-      {/* Overlay */}
       {sidebarOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-black/50"
-          onClick={() => setSidebarOpen(false)}
-        />
+        <>
+          {/* Overlay */}
+          <div
+            className="fixed z-40 bg-black/50"
+            style={{ inset: 0 }}
+            onClick={() => setSidebarOpen(false)}
+          />
+
+          {/* Sidebar */}
+          <div
+            className="fixed z-50 flex flex-col sm:hidden"
+            style={{
+              top: 0,
+              right: 0,
+              bottom: 0,
+              width: "18rem",
+              backgroundColor: "#1a1a1a",
+            }}
+          >
+            <div className="flex items-center justify-between px-6 py-5" style={{ borderBottom: "1px solid #2a2a2a" }}>
+              <span className="font-display text-lg font-bold" style={{ color: "#C4A882" }}>
+                DISHLIST
+              </span>
+              <button onClick={() => setSidebarOpen(false)} aria-label="Fermer">
+                <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="#8a8075" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <nav className="flex flex-col gap-1 px-4 py-6">
+              {navItems.map(({ href, label, icon }) => {
+                const isActive = pathname === href;
+                const isAdd = label === "+ Ajouter un resto";
+                return (
+                  <Link
+                    key={href}
+                    href={href}
+                    onClick={() => setSidebarOpen(false)}
+                    className="flex items-center gap-4 px-4 py-3 rounded-xl text-sm font-medium transition-all"
+                    style={{
+                      backgroundColor: isAdd ? "#C4A882" : isActive ? "#2a2a2a" : "transparent",
+                      color: isAdd ? "#1a1a1a" : isActive ? "#C4A882" : "#8a8075",
+                    }}
+                  >
+                    {icon}
+                    {label}
+                  </Link>
+                );
+              })}
+            </nav>
+          </div>
+        </>
       )}
-
-      {/* Sidebar */}
-      <div
-        className="fixed top-0 bottom-0 right-0 w-72 z-50 flex flex-col transition-transform duration-300 sm:hidden"
-        style={{
-          backgroundColor: "#1a1a1a",
-          transform: sidebarOpen ? "translateX(0)" : "translateX(100%)",
-        }}
-      >
-        {/* Header sidebar */}
-        <div className="flex items-center justify-between px-6 py-5" style={{ borderBottom: "1px solid #2a2a2a" }}>
-          <span className="font-display text-lg font-bold" style={{ color: "#C4A882" }}>
-            DISHLIST
-          </span>
-          <button onClick={() => setSidebarOpen(false)} aria-label="Fermer">
-            <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="#8a8075" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-
-        {/* Nav items */}
-        <nav className="flex flex-col gap-1 px-4 py-6">
-          {navItems.map(({ href, label, icon }) => {
-            const isActive = pathname === href;
-            const isAdd = label === "+ Ajouter un resto";
-            return (
-              <Link
-                key={href}
-                href={href}
-                onClick={() => setSidebarOpen(false)}
-                className="flex items-center gap-4 px-4 py-3 rounded-xl text-sm font-medium transition-all"
-                style={{
-                  backgroundColor: isAdd ? "#C4A882" : isActive ? "#2a2a2a" : "transparent",
-                  color: isAdd ? "#1a1a1a" : isActive ? "#C4A882" : "#8a8075",
-                }}
-              >
-                {icon}
-                {label}
-              </Link>
-            );
-          })}
-        </nav>
-      </div>
     </>
   );
 }
