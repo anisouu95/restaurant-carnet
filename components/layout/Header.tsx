@@ -116,9 +116,9 @@ export function Header() {
 
       {/* Sidebar */}
       <div
-        className="fixed top-0 right-0 w-72 z-50 flex flex-col transition-transform duration-300 sm:hidden"
+        className="fixed top-0 right-0 w-72 z-50 flex flex-col transition-transform duration-300 sm:hidden sidebar-full-height"
         style={{
-          minHeight: "100dvh", backgroundColor: "#1a1a1a",
+          backgroundColor: "#1a1a1a",
           transform: sidebarOpen ? "translateX(0)" : "translateX(100%)",
         }}
       >
