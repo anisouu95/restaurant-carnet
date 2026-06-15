@@ -3,10 +3,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { AuthModal } from "@/components/layout/AuthModal";
 
 export function Header() {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
 
   const navItems = [
     {
@@ -82,6 +84,7 @@ export function Header() {
 
           <div className="flex items-center gap-3">
             <button
+              onClick={() => setAuthOpen(true)}
               className="px-4 py-2 rounded-lg text-sm font-semibold transition-all"
               style={{ backgroundColor: "#C4A882", color: "#1a1a1a" }}
             >
@@ -102,24 +105,21 @@ export function Header() {
         </div>
       </header>
 
+      {authOpen && <AuthModal onClose={() => setAuthOpen(false)} />}
+
       {sidebarOpen && (
         <>
-          {/* Overlay */}
           <div
-            className="fixed z-40 bg-black/50 sidebar-overlay"
+            className="fixed z-40 bg-black/50"
             style={{ inset: 0 }}
             onClick={() => setSidebarOpen(false)}
           />
-
-          {/* Sidebar */}
           <div
             className="z-50 flex flex-col sm:hidden sidebar-panel"
-            style={{}}
+            style={{ backgroundColor: "#1a1a1a" }}
           >
             <div className="flex items-center justify-between px-6 py-5" style={{ borderBottom: "1px solid #2a2a2a" }}>
-              <span className="font-display text-lg font-bold" style={{ color: "#C4A882" }}>
-                DISHLIST
-              </span>
+              <span className="font-display text-lg font-bold" style={{ color: "#C4A882" }}>DISHLIST</span>
               <button onClick={() => setSidebarOpen(false)} aria-label="Fermer">
                 <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="#8a8075" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
