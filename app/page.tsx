@@ -2,18 +2,20 @@
 
 import { useState, useEffect } from "react";
 
-interface FoursquarePlace {
-  fsq_id: string;
+interface GooglePlace {
+  place_id: string;
   name: string;
-  categories: { name: string }[];
-  location: { formatted_address: string };
+  vicinity: string;
   rating?: number;
-  distance?: number;
-  photos?: { prefix: string; suffix: string }[];
+  user_ratings_total?: number;
+  price_level?: number;
+  types: string[];
+  photos?: { photo_reference: string }[];
+  geometry: { location: { lat: number; lng: number } };
 }
 
 export default function RecommandationsPage() {
-  const [places, setPlaces] = useState<FoursquarePlace[]>([]);
+  const [places, setPlaces] = useState<GooglePlace[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -37,6 +39,15 @@ export default function RecommandationsPage() {
     }
   }
 
+  function getPriceLevel(level?: number) {
+    if (!level) return null;
+    return "€".repeat(level);
+  }
+
+  function getPhotoUrl(reference: string) {
+    return `/api/photo?ref=${reference}`;
+  }
+
   return (
     <div style={{ backgroundColor: "#f5f0eb", minHeight: "100vh" }} className="px-10 py-10">
       <div className="mb-8">
@@ -56,68 +67,65 @@ export default function RecommandationsPage() {
         <div className="flex items-center justify-center py-24">
           <p className="text-sm" style={{ color: "#8a8075" }}>{error}</p>
         </div>
+      ) : places.length === 0 ? (
+        <div className="flex items-center justify-center py-24">
+          <p className="text-sm" style={{ color: "#8a8075" }}>Aucun restaurant trouvé à proximité.</p>
+        </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-          {places.map((place) => {
-            const photo = place.photos?.[0];
-            const photoUrl = photo ? `${photo.prefix}400x300${photo.suffix}` : null;
-            const category = place.categories?.[0]?.name ?? "Restaurant";
-            const distance = place.distance
-              ? place.distance < 1000
-                ? `${place.distance}m`
-                : `${(place.distance / 1000).toFixed(1)}km`
-              : null;
-
-            return (
-              <article
-                key={place.fsq_id}
-                className="rounded-xl overflow-hidden border transition-all hover:-translate-y-1 hover:shadow-lg cursor-pointer"
-                style={{ backgroundColor: "#ffffff", borderColor: "#e8e0d5" }}
-              >
-                <div className="relative h-44" style={{ backgroundColor: "#f0ebe4" }}>
-                  {photoUrl ? (
-                    <img src={photoUrl} alt={place.name} className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <span className="text-5xl opacity-20">🍽</span>
-                    </div>
-                  )}
-                  {distance && (
-                    <div className="absolute top-3 left-3 px-2 py-1 rounded-full text-xs font-semibold"
-                      style={{ backgroundColor: "#1a1a1a", color: "#f5f0eb" }}>
-                      📍 {distance}
-                    </div>
-                  )}
-                  {place.rating && (
-                    <div className="absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-semibold"
-                      style={{ backgroundColor: "#C4A882", color: "#1a1a1a" }}>
-                      ★ {place.rating}
-                    </div>
-                  )}
-                </div>
-
-                <div className="p-4">
-                  <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: "#C4A882" }}>
-                    {category}
-                  </p>
-                  <h2 className="font-display text-lg font-semibold leading-tight mb-1" style={{ color: "#1a1a1a" }}>
-                    {place.name}
-                  </h2>
-                  <p className="text-xs truncate mb-4" style={{ color: "#8a8075" }}>
-                    📍 {place.location?.formatted_address}
-                  </p>
-                  <div className="pt-3" style={{ borderTop: "1px solid #f0ebe4" }}>
-                    <button
-                      className="w-full py-2 rounded-lg text-xs font-semibold transition-all hover:opacity-80"
-                      style={{ backgroundColor: "#1a1a1a", color: "#f5f0eb" }}
-                    >
-                      + Ajouter à mon carnet
-                    </button>
+          {places.map((place) => (
+            <article
+              key={place.place_id}
+              className="rounded-xl overflow-hidden border transition-all hover:-translate-y-1 hover:shadow-lg"
+              style={{ backgroundColor: "#ffffff", borderColor: "#e8e0d5" }}
+            >
+              <div className="relative h-44" style={{ backgroundColor: "#f0ebe4" }}>
+                {place.photos?.[0] ? (
+                  <img
+                    src={getPhotoUrl(place.photos[0].photo_reference)}
+                    alt={place.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <span className="text-5xl opacity-20">🍽</span>
                   </div>
+                )}
+                {place.rating && (
+                  <div className="absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-semibold"
+                    style={{ backgroundColor: "#C4A882", color: "#1a1a1a" }}>
+                    ★ {place.rating}
+                  </div>
+                )}
+                {getPriceLevel(place.price_level) && (
+                  <div className="absolute top-3 left-3 px-2 py-1 rounded-full text-xs font-semibold"
+                    style={{ backgroundColor: "#1a1a1a", color: "#f5f0eb" }}>
+                    {getPriceLevel(place.price_level)}
+                  </div>
+                )}
+              </div>
+
+              <div className="p-4">
+                <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: "#C4A882" }}>
+                  {place.user_ratings_total ? `${place.user_ratings_total} avis` : "Restaurant"}
+                </p>
+                <h2 className="font-display text-lg font-semibold leading-tight mb-1" style={{ color: "#1a1a1a" }}>
+                  {place.name}
+                </h2>
+                <p className="text-xs truncate mb-4" style={{ color: "#8a8075" }}>
+                  📍 {place.vicinity}
+                </p>
+                <div className="pt-3" style={{ borderTop: "1px solid #f0ebe4" }}>
+                  <button
+                    className="w-full py-2 rounded-lg text-xs font-semibold transition-all hover:opacity-80"
+                    style={{ backgroundColor: "#1a1a1a", color: "#f5f0eb" }}
+                  >
+                    + Ajouter à mon carnet
+                  </button>
                 </div>
-              </article>
-            );
-          })}
+              </div>
+            </article>
+          ))}
         </div>
       )}
     </div>
