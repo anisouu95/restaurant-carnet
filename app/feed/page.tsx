@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useRestaurants } from "@/hooks/useRestaurants";
 import { StatusBadge } from "@/components/restaurant/StatusBadge";
@@ -17,7 +17,7 @@ function StarDisplay({ rating }: { rating?: number }) {
   );
 }
 
-export default function FeedPage() {
+function FeedContent() {
   const { restaurants, isLoading } = useRestaurants();
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<"visited" | "to-visit">("visited");
@@ -34,14 +34,14 @@ export default function FeedPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <p className="animate-pulse" style={{ color: "#8a8075" }}>Chargement…</p>
+      <div className="flex items-center justify-center py-24">
+        <p className="animate-pulse text-sm" style={{ color: "#8a8075" }}>Chargement…</p>
       </div>
     );
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-8 pb-16">
+    <>
       {/* Onglets */}
       <div className="flex gap-2 mb-8">
         <button
@@ -78,11 +78,8 @@ export default function FeedPage() {
           <p className="mb-8" style={{ color: "#8a8075" }}>
             {activeTab === "visited" ? "Marque un resto comme visité pour le voir ici." : "Ajoute un resto que tu veux essayer."}
           </p>
-          <Link
-            href="/restaurant/new"
-            className="px-6 py-3 rounded-xl font-medium"
-            style={{ backgroundColor: "#1a1a1a", color: "#ffffff" }}
-          >
+          <Link href="/restaurant/new" className="px-6 py-3 rounded-xl font-medium"
+            style={{ backgroundColor: "#1a1a1a", color: "#ffffff" }}>
             + Ajouter un resto
           </Link>
         </div>
@@ -90,12 +87,9 @@ export default function FeedPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           {displayed.map((restaurant) => (
             <Link key={restaurant.id} href={`/restaurant/${restaurant.id}`}>
-              <article
-                className="rounded-xl overflow-hidden border transition-all hover:-translate-y-1 hover:shadow-lg"
-                style={{ backgroundColor: "#ffffff", borderColor: "#e8e0d5" }}
-              >
-                {/* Photo */}
-                <div className="relative h-48" style={{ backgroundColor: "#f0ebe4" }}>
+              <article className="rounded-xl overflow-hidden border transition-all hover:-translate-y-1 hover:shadow-lg"
+                style={{ backgroundColor: "#ffffff", borderColor: "#e8e0d5" }}>
+                <div className="relative h-44" style={{ backgroundColor: "#f0ebe4" }}>
                   {restaurant.photos.length > 0 ? (
                     <img src={restaurant.photos[0]} alt={restaurant.name} className="w-full h-full object-cover" />
                   ) : (
@@ -107,8 +101,6 @@ export default function FeedPage() {
                     <StatusBadge status={restaurant.status} size="sm" />
                   </div>
                 </div>
-
-                {/* Contenu */}
                 <div className="p-4">
                   <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: "#C4A882" }}>
                     {restaurant.cuisine}
@@ -116,19 +108,14 @@ export default function FeedPage() {
                   <h2 className="font-display text-lg font-semibold leading-tight mb-1" style={{ color: "#1a1a1a" }}>
                     {restaurant.name}
                   </h2>
-                  <p className="text-xs mb-3 truncate" style={{ color: "#8a8075" }}>
+                  <p className="text-xs truncate mb-3" style={{ color: "#8a8075" }}>
                     📍 {restaurant.address}
                   </p>
-
                   <div className="flex items-center justify-between pt-3" style={{ borderTop: "1px solid #f0ebe4" }}>
                     <StarDisplay rating={restaurant.rating} />
-                    {!restaurant.rating && (
-                      <span className="text-xs italic" style={{ color: "#c4b8aa" }}>Non noté</span>
-                    )}
+                    {!restaurant.rating && <span className="text-xs italic" style={{ color: "#c4b8aa" }}>Non noté</span>}
                     <span className="text-xs" style={{ color: "#c4b8aa" }}>
-                      {new Date(restaurant.createdAt).toLocaleDateString("fr-FR", {
-                        day: "numeric", month: "short",
-                      })}
+                      {new Date(restaurant.createdAt).toLocaleDateString("fr-FR", { day: "numeric", month: "short" })}
                     </span>
                   </div>
                 </div>
@@ -137,6 +124,20 @@ export default function FeedPage() {
           ))}
         </div>
       )}
+    </>
+  );
+}
+
+export default function FeedPage() {
+  return (
+    <div className="px-10 py-8 pb-16" style={{ backgroundColor: "#f5f0eb", minHeight: "100vh" }}>
+      <div className="mb-6">
+        <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: "#C4A882" }}>Mon carnet</p>
+        <h1 className="font-display text-4xl font-bold" style={{ color: "#1a1a1a" }}>FEED</h1>
+      </div>
+      <Suspense fallback={<p style={{ color: "#8a8075" }}>Chargement…</p>}>
+        <FeedContent />
+      </Suspense>
     </div>
   );
 }
