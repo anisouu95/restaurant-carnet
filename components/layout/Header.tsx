@@ -22,10 +22,6 @@ export function Header() {
     return () => subscription.unsubscribe();
   }, []);
 
-  async function handleLogout() {
-    await supabase.auth.signOut();
-  }
-
   const navItems = [
     {
       href: "/",
@@ -100,20 +96,17 @@ export function Header() {
 
           <div className="flex items-center gap-3">
             {user ? (
-              <div className="flex items-center gap-2">
-                <Link
-                  href="/profil"
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-all"
-                  style={{ backgroundColor: "#2a2a2a", color: "#C4A882" }}
-                >
-                  <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
-                    style={{ backgroundColor: "#C4A882", color: "#1a1a1a" }}>
-                    {user.email?.[0].toUpperCase()}
-                  </div>
-                  <span className="hidden sm:block">{user.email?.split("@")[0]}</span>
-                </Link>
-
-              </div>
+              <Link
+                href="/profil"
+                className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-all"
+                style={{ backgroundColor: "#2a2a2a", color: "#C4A882" }}
+              >
+                <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
+                  style={{ backgroundColor: "#C4A882", color: "#1a1a1a" }}>
+                  {user.email?.[0].toUpperCase()}
+                </div>
+                <span className="hidden sm:block">{user.email?.split("@")[0]}</span>
+              </Link>
             ) : (
               <button
                 onClick={() => setAuthOpen(true)}
@@ -182,25 +175,24 @@ export function Header() {
               })}
 
               {user ? (
-                <button
-                  onClick={() => { handleLogout(); setSidebarOpen(false); }}
+                <Link
+                  href="/profil"
+                  onClick={() => setSidebarOpen(false)}
                   className="flex items-center gap-4 px-4 py-3 rounded-xl text-sm font-medium transition-all mt-4"
-                  style={{ color: "#8a8075", border: "1px solid #2a2a2a" }}
+                  style={{ backgroundColor: "#2a2a2a", color: "#C4A882" }}
                 >
-                  <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                  </svg>
-                  Se déconnecter
-                </button>
+                  <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
+                    style={{ backgroundColor: "#C4A882", color: "#1a1a1a" }}>
+                    {user.email?.[0].toUpperCase()}
+                  </div>
+                  Mon profil
+                </Link>
               ) : (
                 <button
                   onClick={() => { setAuthOpen(true); setSidebarOpen(false); }}
                   className="flex items-center gap-4 px-4 py-3 rounded-xl text-sm font-medium transition-all mt-4"
                   style={{ backgroundColor: "#C4A882", color: "#1a1a1a" }}
                 >
-                  <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                  </svg>
                   Se connecter
                 </button>
               )}

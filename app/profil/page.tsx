@@ -34,16 +34,14 @@ export default function ProfilPage() {
   }
 
   return (
-    <div className="min-h-screen px-4 sm:px-10 py-8" style={{ backgroundColor: "#f5f0eb" }}>
+    <div className="min-h-screen px-4 sm:px-10 py-8 pb-16" style={{ backgroundColor: "#f5f0eb" }}>
       <div className="max-w-lg mx-auto">
 
-        {/* Header */}
         <div className="mb-8">
           <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: "#C4A882" }}>Mon compte</p>
           <h1 className="font-display text-2xl sm:text-4xl font-bold" style={{ color: "#1a1a1a" }}>PROFIL</h1>
         </div>
 
-        {/* Avatar + infos */}
         <div className="rounded-2xl p-6 mb-4 flex items-center gap-5"
           style={{ backgroundColor: "#ffffff", border: "1px solid #e8e0d5" }}>
           <div className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold flex-shrink-0"
@@ -58,7 +56,6 @@ export default function ProfilPage() {
           </div>
         </div>
 
-        {/* Infos profil */}
         <div className="rounded-2xl p-6 mb-4"
           style={{ backgroundColor: "#ffffff", border: "1px solid #e8e0d5" }}>
           <p className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: "#C4A882" }}>
@@ -80,10 +77,9 @@ export default function ProfilPage() {
           </div>
         </div>
 
-        {/* Bouton déconnexion */}
         <button
           onClick={handleLogout}
-          className="w-full py-4 rounded-2xl text-sm font-semibold transition-all mt-4"
+          className="w-full py-4 rounded-2xl text-sm font-semibold transition-all"
           style={{ backgroundColor: "#ffffff", color: "#c0392b", border: "1px solid #ffd5d5" }}
         >
           Se déconnecter
