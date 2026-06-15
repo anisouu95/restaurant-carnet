@@ -50,7 +50,7 @@ export default function RecommandationsPage() {
   }
 
   return (
-    <div style={{ backgroundColor: "#f5f0eb", minHeight: "100vh" }} className="px-10 py-10">
+    <div style={{ backgroundColor: "#f5f0eb", minHeight: "100vh" }} className="px-4 sm:px-10 py-6 sm:py-10">
       <div className="mb-8">
         <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: "#C4A882" }}>
           Autour de toi

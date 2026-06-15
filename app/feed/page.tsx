@@ -130,7 +130,7 @@ function FeedContent() {
 
 export default function FeedPage() {
   return (
-    <div className="px-10 py-8 pb-16" style={{ backgroundColor: "#f5f0eb", minHeight: "100vh" }}>
+    <div className="px-4 sm:px-10 py-6 sm:py-8 pb-16" style={{ backgroundColor: "#f5f0eb", minHeight: "100vh" }}>
       <div className="mb-6">
         <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: "#C4A882" }}>Mon carnet</p>
         <h1 className="font-display text-4xl font-bold" style={{ color: "#1a1a1a" }}>FEED</h1>

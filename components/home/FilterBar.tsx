@@ -16,7 +16,7 @@ export function FilterBar({ filters, onChange, counts }: FilterBarProps) {
   ];
 
   return (
-    <div className="flex flex-wrap items-center gap-3">
+    <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide">
       <div className="flex items-center gap-1 bg-white rounded-xl p-1 border border-stone-200 shadow-sm">
         {statusOptions.map(({ value, label, count }) => (
           <button
