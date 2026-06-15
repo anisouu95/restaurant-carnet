@@ -77,22 +77,22 @@ export function RestaurantForm() {
 
   return (
     <div style={{ backgroundColor: "#f5f0eb", minHeight: "100vh" }} className="pb-16">
-      <div className="px-10 py-10 w-full">
+      <div className="px-4 sm:px-10 py-6 sm:py-10 w-full">
 
         {/* Header */}
-        <div className="flex items-center justify-between mb-10">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8 sm:mb-10">
           <div>
             <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: "#C4A882" }}>
               Mon carnet
             </p>
-            <h1 className="font-display text-4xl font-bold" style={{ color: "#1a1a1a" }}>
+            <h1 className="font-display text-2xl sm:text-4xl font-bold" style={{ color: "#1a1a1a" }}>
               NOUVEAU RESTAURANT
             </h1>
           </div>
           <button
             onClick={handleSubmit}
             disabled={!form.name || !form.address || isSubmitting}
-            className="px-6 py-3 rounded-lg text-sm font-bold uppercase tracking-wider transition-all disabled:opacity-30"
+            className="w-full sm:w-auto px-6 py-3 rounded-lg text-sm font-bold uppercase tracking-wider transition-all disabled:opacity-30"
             style={{ backgroundColor: "#1a1a1a", color: "#f5f0eb" }}
           >
             {isSubmitting ? "…" : "Ajouter"}
