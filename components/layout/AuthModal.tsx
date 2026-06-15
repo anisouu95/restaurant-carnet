@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { supabase } from "@/lib/supabase";
 
 interface AuthModalProps {
   onClose: () => void;
@@ -12,11 +13,34 @@ export function AuthModal({ onClose }: AuthModalProps) {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setIsLoading(true);
-    setTimeout(() => setIsLoading(false), 1500);
+    setError(null);
+    setSuccess(null);
+
+    if (mode === "login") {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) setError("Email ou mot de passe incorrect.");
+      else onClose();
+    } else {
+      const { data, error } = await supabase.auth.signUp({ email, password });
+      if (error) {
+        setError("Erreur lors de la création du compte.");
+      } else {
+        if (data.user) {
+          await supabase.from("profiles").insert({
+            id: data.user.id,
+            full_name: name,
+          });
+        }
+        setSuccess("Compte créé ! Vérifie tes emails pour confirmer.");
+      }
+    }
+    setIsLoading(false);
   }
 
   return (
@@ -49,7 +73,7 @@ export function AuthModal({ onClose }: AuthModalProps) {
 
         <div className="flex rounded-xl p-1 mb-6" style={{ backgroundColor: "#f5f0eb" }}>
           <button
-            onClick={() => setMode("login")}
+            onClick={() => { setMode("login"); setError(null); setSuccess(null); }}
             className="flex-1 py-2 rounded-lg text-sm font-semibold transition-all"
             style={{
               backgroundColor: mode === "login" ? "#1a1a1a" : "transparent",
@@ -59,7 +83,7 @@ export function AuthModal({ onClose }: AuthModalProps) {
             Connexion
           </button>
           <button
-            onClick={() => setMode("register")}
+            onClick={() => { setMode("register"); setError(null); setSuccess(null); }}
             className="flex-1 py-2 rounded-lg text-sm font-semibold transition-all"
             style={{
               backgroundColor: mode === "register" ? "#1a1a1a" : "transparent",
@@ -69,6 +93,18 @@ export function AuthModal({ onClose }: AuthModalProps) {
             Créer un compte
           </button>
         </div>
+
+        {error && (
+          <div className="mb-4 px-4 py-3 rounded-xl text-sm" style={{ backgroundColor: "#fff0f0", color: "#c0392b", border: "1px solid #ffd5d5" }}>
+            {error}
+          </div>
+        )}
+
+        {success && (
+          <div className="mb-4 px-4 py-3 rounded-xl text-sm" style={{ backgroundColor: "#f0fff4", color: "#27ae60", border: "1px solid #d5ffd5" }}>
+            {success}
+          </div>
+        )}
 
         <div className="flex flex-col gap-4">
           {mode === "register" && (
