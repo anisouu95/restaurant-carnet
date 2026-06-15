@@ -3,15 +3,14 @@
 import { useState, useEffect } from "react";
 
 interface GooglePlace {
-  place_id: string;
-  name: string;
-  vicinity: string;
+  id: string;
+  displayName: { text: string };
+  formattedAddress: string;
   rating?: number;
-  user_ratings_total?: number;
-  price_level?: number;
-  types: string[];
-  photos?: { photo_reference: string }[];
-  geometry: { location: { lat: number; lng: number } };
+  userRatingCount?: number;
+  priceLevel?: string;
+  primaryTypeDisplayName?: { text: string };
+  photos?: { name: string }[];
 }
 
 export default function RecommandationsPage() {
@@ -31,7 +30,7 @@ export default function RecommandationsPage() {
     try {
       const res = await fetch(`/api/recommandations?lat=${lat}&lng=${lng}`);
       const data = await res.json();
-      setPlaces(data.results ?? []);
+      setPlaces(data.places ?? []);
     } catch {
       setError("Impossible de charger les recommandations.");
     } finally {
@@ -39,13 +38,15 @@ export default function RecommandationsPage() {
     }
   }
 
-  function getPriceLevel(level?: number) {
-    if (!level) return null;
-    return "€".repeat(level);
-  }
-
-  function getPhotoUrl(reference: string) {
-    return `/api/photo?ref=${reference}`;
+  function getPriceLevel(level?: string) {
+    const map: Record<string, string> = {
+      PRICE_LEVEL_FREE: "Gratuit",
+      PRICE_LEVEL_INEXPENSIVE: "€",
+      PRICE_LEVEL_MODERATE: "€€",
+      PRICE_LEVEL_EXPENSIVE: "€€€",
+      PRICE_LEVEL_VERY_EXPENSIVE: "€€€€",
+    };
+    return level ? map[level] : null;
   }
 
   return (
@@ -75,45 +76,38 @@ export default function RecommandationsPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           {places.map((place) => (
             <article
-              key={place.place_id}
+              key={place.id}
               className="rounded-xl overflow-hidden border transition-all hover:-translate-y-1 hover:shadow-lg"
               style={{ backgroundColor: "#ffffff", borderColor: "#e8e0d5" }}
             >
               <div className="relative h-44" style={{ backgroundColor: "#f0ebe4" }}>
-                {place.photos?.[0] ? (
-                  <img
-                    src={getPhotoUrl(place.photos[0].photo_reference)}
-                    alt={place.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <span className="text-5xl opacity-20">🍽</span>
-                  </div>
-                )}
+                <div className="w-full h-full flex items-center justify-center">
+                  <span className="text-5xl opacity-20">🍽</span>
+                </div>
                 {place.rating && (
                   <div className="absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-semibold"
                     style={{ backgroundColor: "#C4A882", color: "#1a1a1a" }}>
                     ★ {place.rating}
                   </div>
                 )}
-                {getPriceLevel(place.price_level) && (
+                {getPriceLevel(place.priceLevel) && (
                   <div className="absolute top-3 left-3 px-2 py-1 rounded-full text-xs font-semibold"
                     style={{ backgroundColor: "#1a1a1a", color: "#f5f0eb" }}>
-                    {getPriceLevel(place.price_level)}
+                    {getPriceLevel(place.priceLevel)}
                   </div>
                 )}
               </div>
 
               <div className="p-4">
                 <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: "#C4A882" }}>
-                  {place.user_ratings_total ? `${place.user_ratings_total} avis` : "Restaurant"}
+                  {place.primaryTypeDisplayName?.text ?? "Restaurant"}
+                  {place.userRatingCount ? ` · ${place.userRatingCount} avis` : ""}
                 </p>
                 <h2 className="font-display text-lg font-semibold leading-tight mb-1" style={{ color: "#1a1a1a" }}>
-                  {place.name}
+                  {place.displayName.text}
                 </h2>
                 <p className="text-xs truncate mb-4" style={{ color: "#8a8075" }}>
-                  📍 {place.vicinity}
+                  📍 {place.formattedAddress}
                 </p>
                 <div className="pt-3" style={{ borderTop: "1px solid #f0ebe4" }}>
                   <button

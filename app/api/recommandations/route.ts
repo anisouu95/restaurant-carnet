@@ -8,14 +8,32 @@ export async function GET(req: NextRequest) {
 
   try {
     const res = await fetch(
-      `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=1500&type=restaurant&key=${key}&language=fr`,
-      { cache: "no-store" }
+      `https://places.googleapis.com/v1/places:searchNearby`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Goog-Api-Key": key,
+          "X-Goog-FieldMask": "places.id,places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.priceLevel,places.photos,places.primaryTypeDisplayName",
+        },
+        body: JSON.stringify({
+          includedTypes: ["restaurant"],
+          maxResultCount: 12,
+          locationRestriction: {
+            circle: {
+              center: { latitude: parseFloat(lat), longitude: parseFloat(lng) },
+              radius: 1500,
+            },
+          },
+        }),
+        cache: "no-store",
+      }
     );
 
     const data = await res.json();
     return NextResponse.json(data);
   } catch (err) {
     console.error("Google Places error:", err);
-    return NextResponse.json({ results: [] }, { status: 200 });
+    return NextResponse.json({ places: [] }, { status: 200 });
   }
 }
