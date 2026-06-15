@@ -55,7 +55,7 @@ export default function RecommandationsPage() {
         <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: "#C4A882" }}>
           Autour de toi
         </p>
-        <h1 className="font-display text-4xl font-bold" style={{ color: "#1a1a1a" }}>
+        <h1 className="font-display text-2xl sm:text-4xl font-bold" style={{ color: "#1a1a1a" }}>
           RECOMMANDATIONS
         </h1>
       </div>

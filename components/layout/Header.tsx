@@ -106,14 +106,14 @@ export function Header() {
         <>
           {/* Overlay */}
           <div
-            className="fixed z-40 bg-black/50"
+            className="fixed z-40 bg-black/50 sidebar-overlay"
             style={{ inset: 0 }}
             onClick={() => setSidebarOpen(false)}
           />
 
           {/* Sidebar */}
           <div
-            className="fixed z-50 flex flex-col sm:hidden"
+            className="fixed z-50 flex flex-col sm:hidden sidebar-panel"
             style={{
               top: 0,
               right: 0,
