@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Playfair_Display, DM_Sans } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
-import { BottomNav } from "@/components/layout/BottomNav";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -17,8 +16,8 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Mon Carnet de Restos",
-  description: "Mes restaurants à visiter et mes coups de cœur",
+  title: "DISHLIST",
+  description: "L'historique de nos petites et grandes faims",
 };
 
 export default function RootLayout({
@@ -30,10 +29,7 @@ export default function RootLayout({
     <html lang="fr" className={`${playfair.variable} ${dmSans.variable}`}>
       <body style={{ backgroundColor: "#f5f0eb", color: "#1a1a1a" }} className="antialiased">
         <Header />
-        <main className="min-h-screen pb-28 sm:pb-0">{children}</main>
-        <div className="sm:hidden">
-          <BottomNav />
-        </div>
+        <main className="min-h-screen">{children}</main>
       </body>
     </html>
   );
