@@ -1,122 +1,123 @@
 "use client";
 
-import { useRestaurants } from "@/hooks/useRestaurants";
-import { StatusBadge } from "@/components/restaurant/StatusBadge";
-import Link from "next/link";
+import { useState, useEffect } from "react";
 
-function StarDisplay({ rating }: { rating?: number }) {
-  if (!rating) return null;
-  return (
-    <div className="flex items-center gap-0.5">
-      {Array.from({ length: 5 }).map((_, i) => (
-        <span key={i} className={`text-base ${i < rating ? "text-amber-400" : "text-stone-200"}`}>
-          ★
-        </span>
-      ))}
-    </div>
-  );
+interface FoursquarePlace {
+  fsq_id: string;
+  name: string;
+  categories: { name: string }[];
+  location: { formatted_address: string };
+  rating?: number;
+  distance?: number;
+  photos?: { prefix: string; suffix: string }[];
 }
 
-export default function FeedPage() {
-  const { restaurants, isLoading } = useRestaurants();
+export default function RecommandationsPage() {
+  const [places, setPlaces] = useState<FoursquarePlace[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <p className="text-stone-400 animate-pulse">Chargement…</p>
-      </div>
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => fetchPlaces(pos.coords.latitude, pos.coords.longitude),
+      () => fetchPlaces(48.8566, 2.3522)
     );
+  }, []);
+
+  async function fetchPlaces(lat: number, lng: number) {
+    setIsLoading(true);
+    try {
+      const res = await fetch(`/api/recommandations?lat=${lat}&lng=${lng}`);
+      const data = await res.json();
+      setPlaces(data.results ?? []);
+    } catch {
+      setError("Impossible de charger les recommandations.");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
-    <div className="max-w-lg mx-auto px-4 py-8">
-      {/* Header */}
+    <div style={{ backgroundColor: "#f5f0eb", minHeight: "100vh" }} className="px-10 py-10">
       <div className="mb-8">
-        <p className="text-xs font-medium text-stone-400 uppercase tracking-widest mb-1">
-          Mon carnet
+        <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: "#C4A882" }}>
+          Autour de toi
         </p>
-        <h1 className="font-display text-4xl font-bold text-stone-900 leading-tight">
-          FEED
+        <h1 className="font-display text-4xl font-bold" style={{ color: "#1a1a1a" }}>
+          RECOMMANDATIONS
         </h1>
       </div>
 
-      {/* Liste */}
-      {restaurants.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-24 text-center">
-          <span className="text-6xl mb-6">🍽</span>
-          <h2 className="font-display text-2xl font-semibold text-stone-700 mb-3">
-            Aucun restaurant
-          </h2>
-          <p className="text-stone-400 mb-8">
-            Appuie sur le + pour ajouter ton premier resto.
-          </p>
+      {isLoading ? (
+        <div className="flex items-center justify-center py-24">
+          <p className="animate-pulse text-sm" style={{ color: "#8a8075" }}>Recherche des restos proches…</p>
+        </div>
+      ) : error ? (
+        <div className="flex items-center justify-center py-24">
+          <p className="text-sm" style={{ color: "#8a8075" }}>{error}</p>
         </div>
       ) : (
-        <div className="space-y-5">
-          {restaurants.map((restaurant) => (
-            <Link key={restaurant.id} href={`/restaurant/${restaurant.id}`}>
-              <article className="bg-white rounded-2xl overflow-hidden border border-stone-100 shadow-sm hover:shadow-md transition-shadow mb-5">
-                {/* Photo */}
-                <div className="relative h-52 bg-gradient-to-br from-stone-100 to-stone-200">
-                  {restaurant.photos.length > 0 ? (
-                    <img
-                      src={restaurant.photos[0]}
-                      alt={restaurant.name}
-                      className="w-full h-full object-cover"
-                    />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+          {places.map((place) => {
+            const photo = place.photos?.[0];
+            const photoUrl = photo ? `${photo.prefix}400x300${photo.suffix}` : null;
+            const category = place.categories?.[0]?.name ?? "Restaurant";
+            const distance = place.distance
+              ? place.distance < 1000
+                ? `${place.distance}m`
+                : `${(place.distance / 1000).toFixed(1)}km`
+              : null;
+
+            return (
+              <article
+                key={place.fsq_id}
+                className="rounded-xl overflow-hidden border transition-all hover:-translate-y-1 hover:shadow-lg cursor-pointer"
+                style={{ backgroundColor: "#ffffff", borderColor: "#e8e0d5" }}
+              >
+                <div className="relative h-44" style={{ backgroundColor: "#f0ebe4" }}>
+                  {photoUrl ? (
+                    <img src={photoUrl} alt={place.name} className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <span className="text-6xl opacity-20">🍽</span>
+                      <span className="text-5xl opacity-20">🍽</span>
                     </div>
                   )}
-                  <div className="absolute top-3 right-3">
-                    <StatusBadge status={restaurant.status} size="sm" />
-                  </div>
+                  {distance && (
+                    <div className="absolute top-3 left-3 px-2 py-1 rounded-full text-xs font-semibold"
+                      style={{ backgroundColor: "#1a1a1a", color: "#f5f0eb" }}>
+                      📍 {distance}
+                    </div>
+                  )}
+                  {place.rating && (
+                    <div className="absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-semibold"
+                      style={{ backgroundColor: "#C4A882", color: "#1a1a1a" }}>
+                      ★ {place.rating}
+                    </div>
+                  )}
                 </div>
 
-                {/* Contenu */}
-                <div className="p-5">
-                  {/* Cuisine + date */}
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-medium text-stone-400 uppercase tracking-widest">
-                      {restaurant.cuisine}
-                    </span>
-                    <span className="text-xs text-stone-300">
-                      {new Date(restaurant.createdAt).toLocaleDateString("fr-FR", {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                      })}
-                    </span>
-                  </div>
-
-                  {/* Nom */}
-                  <h2 className="font-display text-2xl font-semibold text-stone-900 mb-1 leading-tight">
-                    {restaurant.name}
-                  </h2>
-
-                  {/* Adresse */}
-                  <p className="text-sm text-stone-400 mb-4">
-                    📍 {restaurant.address}
+                <div className="p-4">
+                  <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: "#C4A882" }}>
+                    {category}
                   </p>
-
-                  {/* Note */}
-                  {restaurant.rating && (
-                    <div className="mb-3">
-                      <StarDisplay rating={restaurant.rating} />
-                    </div>
-                  )}
-
-                  {/* Avis */}
-                  {restaurant.review && (
-                    <p className="text-sm text-stone-600 leading-relaxed line-clamp-3 border-t border-stone-100 pt-4">
-                      {restaurant.review}
-                    </p>
-                  )}
+                  <h2 className="font-display text-lg font-semibold leading-tight mb-1" style={{ color: "#1a1a1a" }}>
+                    {place.name}
+                  </h2>
+                  <p className="text-xs truncate mb-4" style={{ color: "#8a8075" }}>
+                    📍 {place.location?.formatted_address}
+                  </p>
+                  <div className="pt-3" style={{ borderTop: "1px solid #f0ebe4" }}>
+                    <button
+                      className="w-full py-2 rounded-lg text-xs font-semibold transition-all hover:opacity-80"
+                      style={{ backgroundColor: "#1a1a1a", color: "#f5f0eb" }}
+                    >
+                      + Ajouter à mon carnet
+                    </button>
+                  </div>
                 </div>
               </article>
-            </Link>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

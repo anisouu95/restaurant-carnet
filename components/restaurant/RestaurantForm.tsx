@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { CreateRestaurantInput, CuisineType, CUISINE_TYPES, RestaurantStatus } from "@/lib/types";
+import { CreateRestaurantInput, CuisineType, CUISINE_TYPES } from "@/lib/types";
 import { useRestaurants } from "@/hooks/useRestaurants";
 
 const PRICE_OPTIONS = [
@@ -76,214 +76,237 @@ export function RestaurantForm() {
   }
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div style={{ backgroundColor: "#f5f0eb", minHeight: "100vh" }} className="pb-16">
+      <div className="px-10 py-10 w-full">
 
-      {/* Header fixe */}
-      <div className="sticky top-0 z-10 bg-stone-50/90 backdrop-blur-md px-5 pt-5 pb-4 border-b border-stone-200/60">
-        <div className="flex items-center justify-between">
-          <button
-            onClick={() => router.back()}
-            className="w-9 h-9 rounded-full bg-white border border-stone-200 shadow-sm flex items-center justify-center text-stone-500 text-sm hover:bg-stone-50 transition-colors"
-          >
-            ✕
-          </button>
-          <h1 className="font-display text-base font-semibold text-stone-800">Nouveau restaurant</h1>
+        {/* Header */}
+        <div className="flex items-center justify-between mb-10">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: "#C4A882" }}>
+              Mon carnet
+            </p>
+            <h1 className="font-display text-4xl font-bold" style={{ color: "#1a1a1a" }}>
+              NOUVEAU RESTAURANT
+            </h1>
+          </div>
           <button
             onClick={handleSubmit}
             disabled={!form.name || !form.address || isSubmitting}
-            className="px-4 py-2 rounded-full bg-stone-900 text-white text-sm font-medium shadow-sm
-              disabled:opacity-30 hover:bg-stone-700 transition-colors"
+            className="px-6 py-3 rounded-lg text-sm font-bold uppercase tracking-wider transition-all disabled:opacity-30"
+            style={{ backgroundColor: "#1a1a1a", color: "#f5f0eb" }}
           >
             {isSubmitting ? "…" : "Ajouter"}
           </button>
         </div>
-      </div>
 
-      <div className="px-5 py-6 space-y-3 pb-32">
+        {/* Grid 2 colonnes */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
 
-        {/* Bloc nom + adresse */}
-        <div className="bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden">
-          <div className="px-4 pt-4 pb-3 border-b border-stone-100">
-            <p className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest mb-2">Restaurant</p>
-            <input
-              type="text"
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              placeholder="Nom du restaurant"
-              className="w-full text-lg font-display font-semibold text-stone-800 placeholder-stone-300 bg-transparent outline-none"
-            />
-          </div>
-          <div className="px-4 py-3 relative">
-            <p className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest mb-2">Adresse</p>
-            <div className="flex items-center gap-2">
-              <span className="text-stone-300 text-sm">📍</span>
+          {/* Colonne gauche */}
+          <div className="space-y-4">
+
+            {/* Nom + Adresse */}
+            <div className="rounded-xl p-6" style={{ backgroundColor: "#ffffff", border: "1px solid #e8e0d5" }}>
+              <p className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: "#C4A882" }}>
+                Informations
+              </p>
               <input
                 type="text"
-                value={form.address}
-                onChange={(e) => {
-                  setForm({ ...form, address: e.target.value, coordinates: undefined });
-                  searchAddress(e.target.value);
-                }}
-                placeholder="Rechercher une adresse…"
-                className="flex-1 text-sm text-stone-600 placeholder-stone-300 bg-transparent outline-none"
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                placeholder="Nom du restaurant"
+                className="w-full text-2xl font-display font-bold bg-transparent outline-none mb-4 pb-3"
+                style={{ color: "#1a1a1a", borderBottom: "1px solid #e8e0d5" }}
               />
-              {isSearching && <span className="text-xs text-stone-300 animate-pulse">…</span>}
-              {form.coordinates && <span className="text-xs text-green-500 font-medium">✓</span>}
+              <div className="relative">
+                <div className="flex items-center gap-2">
+                  <span style={{ color: "#C4A882" }}>📍</span>
+                  <input
+                    type="text"
+                    value={form.address}
+                    onChange={(e) => {
+                      setForm({ ...form, address: e.target.value, coordinates: undefined });
+                      searchAddress(e.target.value);
+                    }}
+                    placeholder="Rechercher une adresse…"
+                    className="flex-1 text-sm bg-transparent outline-none"
+                    style={{ color: "#8a8075" }}
+                  />
+                  {isSearching && <span className="text-xs animate-pulse" style={{ color: "#C4A882" }}>…</span>}
+                  {form.coordinates && <span className="text-xs font-medium" style={{ color: "#C4A882" }}>✓</span>}
+                </div>
+                {addressSuggestions.length > 0 && (
+                  <div className="absolute left-0 right-0 top-full z-50 rounded-xl shadow-xl mt-2 overflow-hidden"
+                    style={{ backgroundColor: "#ffffff", border: "1px solid #e8e0d5" }}>
+                    {addressSuggestions.map((feature) => (
+                      <button
+                        key={feature.id}
+                        type="button"
+                        onClick={() => selectAddress(feature)}
+                        className="w-full text-left px-4 py-3 transition-colors hover:bg-stone-50"
+                        style={{ borderBottom: "1px solid #e8e0d5", color: "#1a1a1a" }}
+                      >
+                        <p className="text-sm font-medium truncate">{feature.text}</p>
+                        <p className="text-xs truncate mt-0.5" style={{ color: "#8a8075" }}>{feature.place_name}</p>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
-            {addressSuggestions.length > 0 && (
-              <div className="absolute left-0 right-0 top-full z-50 bg-white border border-stone-200 rounded-2xl shadow-xl mt-1 mx-0 overflow-hidden">
-                {addressSuggestions.map((feature) => (
+            {/* Type de cuisine */}
+            <div className="rounded-xl p-6" style={{ backgroundColor: "#ffffff", border: "1px solid #e8e0d5" }}>
+              <p className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: "#C4A882" }}>
+                Type de cuisine
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {CUISINE_TYPES.map((c) => (
                   <button
-                    key={feature.id}
+                    key={c}
                     type="button"
-                    onClick={() => selectAddress(feature)}
-                    className="w-full text-left px-4 py-3 hover:bg-stone-50 transition-colors border-b border-stone-100 last:border-0"
+                    onClick={() => setForm({ ...form, cuisine: c })}
+                    className="px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
+                    style={{
+                      backgroundColor: form.cuisine === c ? "#1a1a1a" : "transparent",
+                      color: form.cuisine === c ? "#f5f0eb" : "#8a8075",
+                      border: `1px solid ${form.cuisine === c ? "#1a1a1a" : "#e8e0d5"}`,
+                    }}
                   >
-                    <p className="text-sm font-medium text-stone-700 truncate">{feature.text}</p>
-                    <p className="text-xs text-stone-400 truncate mt-0.5">{feature.place_name}</p>
+                    {c}
                   </button>
                 ))}
               </div>
-            )}
-          </div>
-        </div>
-
-        {/* Cuisine */}
-        <div className="bg-white rounded-2xl border border-stone-100 shadow-sm px-4 py-4">
-          <p className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest mb-3">Type de cuisine</p>
-          <div className="flex flex-wrap gap-2">
-            {CUISINE_TYPES.map((c) => (
-              <button
-                key={c}
-                type="button"
-                onClick={() => setForm({ ...form, cuisine: c })}
-                className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-all
-                  ${form.cuisine === c
-                    ? "bg-stone-900 text-white border-stone-900"
-                    : "bg-white text-stone-500 border-stone-200 hover:border-stone-400"
-                  }`}
-              >
-                {c}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Rating */}
-        <div className="bg-white rounded-2xl border border-stone-100 shadow-sm px-4 py-5">
-          <p className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest mb-4">Note</p>
-          <div className="flex items-center justify-center gap-4 mb-4">
-            {Array.from({ length: 5 }).map((_, i) => {
-              const star = i + 1;
-              const filled = hoveredRating ? star <= hoveredRating : star <= rating;
-              return (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => { setRating(star); setNoRating(false); }}
-                  onMouseEnter={() => setHoveredRating(star)}
-                  onMouseLeave={() => setHoveredRating(0)}
-                  className="text-4xl transition-all hover:scale-110 active:scale-95"
-                >
-                  <span className={`transition-colors ${filled && !noRating ? "text-amber-400" : "text-stone-200"}`}>★</span>
-                </button>
-              );
-            })}
-          </div>
-          <p className="text-center text-sm text-stone-400">
-            {noRating ? "Sans note" : rating > 0 ? `${rating} étoile${rating > 1 ? "s" : ""}` : "Appuie pour noter"}
-          </p>
-        </div>
-
-        {/* Sans note */}
-        <button
-          type="button"
-          onClick={() => { setNoRating(!noRating); setRating(0); }}
-          className={`w-full bg-white rounded-2xl border shadow-sm px-4 py-4 flex items-center gap-4 transition-all
-            ${noRating ? "border-stone-400" : "border-stone-100"}`}
-        >
-          <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg transition-colors
-            ${noRating ? "bg-stone-900 text-white" : "bg-stone-100"}`}>
-            🔖
-          </div>
-          <div className="text-left">
-            <p className="text-sm font-semibold text-stone-800">Mémoriser sans noter</p>
-            <p className="text-xs text-stone-400 mt-0.5">Je veux juste garder ce spot</p>
-          </div>
-          <div className={`ml-auto w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors
-            ${noRating ? "border-stone-900 bg-stone-900" : "border-stone-300"}`}>
-            {noRating && <span className="text-white text-xs">✓</span>}
-          </div>
-        </button>
-
-        {/* Photos */}
-        <div className="bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden">
-          <p className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest px-4 pt-4 mb-3">Photos</p>
-          {photos.length > 0 && (
-            <div className="grid grid-cols-3 gap-1 px-4 mb-3">
-              {photos.map((p, i) => (
-                <div key={i} className="relative aspect-square rounded-xl overflow-hidden">
-                  <img src={p} alt="" className="w-full h-full object-cover" />
-                  <button
-                    onClick={() => setPhotos(photos.filter((_, j) => j !== i))}
-                    className="absolute top-1 right-1 w-5 h-5 bg-black/50 text-white rounded-full text-xs flex items-center justify-center"
-                  >✕</button>
-                </div>
-              ))}
             </div>
-          )}
-          <div className="grid grid-cols-2 border-t border-stone-100 divide-x divide-stone-100">
-            <label className="flex flex-col items-center gap-2 py-5 cursor-pointer hover:bg-stone-50 transition-colors">
-              <div className="w-11 h-11 rounded-full bg-stone-100 flex items-center justify-center text-xl">🖼</div>
-              <p className="text-sm font-medium text-stone-600">Galerie</p>
-              <p className="text-xs text-stone-300">{photos.length}/20</p>
-              <input type="file" accept="image/*" multiple onChange={handlePhotoUpload} className="hidden" />
-            </label>
-            <label className="flex flex-col items-center gap-2 py-5 cursor-pointer hover:bg-stone-50 transition-colors">
-              <div className="w-11 h-11 rounded-full bg-stone-100 flex items-center justify-center text-xl">📷</div>
-              <p className="text-sm font-medium text-stone-600">Caméra</p>
-              <input type="file" accept="image/*" capture="environment" onChange={handlePhotoUpload} className="hidden" />
-            </label>
-          </div>
-        </div>
 
-        {/* Prix */}
-        <div className="bg-white rounded-2xl border border-stone-100 shadow-sm px-4 py-4">
-          <p className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest mb-3">Prix moyen</p>
-          <div className="grid grid-cols-4 gap-2">
-            {PRICE_OPTIONS.map((opt) => (
+            {/* Prix */}
+            <div className="rounded-xl p-6" style={{ backgroundColor: "#ffffff", border: "1px solid #e8e0d5" }}>
+              <p className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: "#C4A882" }}>
+                Prix moyen
+              </p>
+              <div className="grid grid-cols-4 gap-2">
+                {PRICE_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setPrice(price === opt.value ? "" : opt.value)}
+                    className="flex flex-col items-center py-3 rounded-xl transition-all"
+                    style={{
+                      backgroundColor: price === opt.value ? "#1a1a1a" : "transparent",
+                      color: price === opt.value ? "#f5f0eb" : "#8a8075",
+                      border: `1px solid ${price === opt.value ? "#1a1a1a" : "#e8e0d5"}`,
+                    }}
+                  >
+                    <span className="text-sm font-bold">{opt.value}</span>
+                    <span className="text-xs mt-0.5 opacity-70">{opt.sub}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Colonne droite */}
+          <div className="space-y-4">
+
+            {/* Note */}
+            <div className="rounded-xl p-6" style={{ backgroundColor: "#ffffff", border: "1px solid #e8e0d5" }}>
+              <p className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: "#C4A882" }}>
+                Note
+              </p>
+              <div className="flex items-center gap-3 mb-4">
+                {Array.from({ length: 5 }).map((_, i) => {
+                  const star = i + 1;
+                  const filled = hoveredRating ? star <= hoveredRating : star <= rating;
+                  return (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => { setRating(star); setNoRating(false); }}
+                      onMouseEnter={() => setHoveredRating(star)}
+                      onMouseLeave={() => setHoveredRating(0)}
+                      className="text-4xl transition-all hover:scale-110"
+                    >
+                      <span style={{ color: filled && !noRating ? "#C4A882" : "#e8e0d5" }}>★</span>
+                    </button>
+                  );
+                })}
+                <span className="text-sm ml-2" style={{ color: "#8a8075" }}>
+                  {noRating ? "Sans note" : rating > 0 ? `${rating}/5` : "Clique pour noter"}
+                </span>
+              </div>
               <button
-                key={opt.value}
                 type="button"
-                onClick={() => setPrice(price === opt.value ? "" : opt.value)}
-                className={`flex flex-col items-center py-3 rounded-xl border transition-all
-                  ${price === opt.value
-                    ? "border-stone-900 bg-stone-900 text-white"
-                    : "border-stone-200 text-stone-500 hover:border-stone-300 bg-white"
-                  }`}
+                onClick={() => { setNoRating(!noRating); setRating(0); }}
+                className="flex items-center gap-3 w-full p-3 rounded-xl transition-all"
+                style={{
+                  backgroundColor: noRating ? "#f5f0eb" : "transparent",
+                  border: `1px solid ${noRating ? "#C4A882" : "#e8e0d5"}`,
+                }}
               >
-                <span className="text-sm font-semibold">{opt.value}</span>
-                <span className="text-[10px] mt-0.5 opacity-60">{opt.sub}</span>
+                <span>🔖</span>
+                <div className="text-left">
+                  <p className="text-sm font-medium" style={{ color: "#1a1a1a" }}>Mémoriser sans noter</p>
+                  <p className="text-xs" style={{ color: "#8a8075" }}>Je veux juste garder ce spot</p>
+                </div>
               </button>
-            ))}
+            </div>
+
+            {/* Avis */}
+            <div className="rounded-xl p-6" style={{ backgroundColor: "#ffffff", border: "1px solid #e8e0d5" }}>
+              <p className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: "#C4A882" }}>
+                Ton avis
+              </p>
+              <textarea
+                value={form.review}
+                onChange={(e) => setForm({ ...form, review: e.target.value })}
+                placeholder="Qu'est-ce qui t'a plu ? Qu'est-ce qui le rend spécial ?"
+                rows={5}
+                maxLength={1000}
+                className="w-full text-sm bg-transparent outline-none resize-none leading-relaxed"
+                style={{ color: "#1a1a1a" }}
+              />
+              <p className="text-xs text-right mt-2" style={{ color: "#c4b8aa" }}>
+                {(form.review ?? "").length}/1000
+              </p>
+            </div>
+
+            {/* Photos */}
+            <div className="rounded-xl overflow-hidden" style={{ backgroundColor: "#ffffff", border: "1px solid #e8e0d5" }}>
+              <div className="p-6 pb-4">
+                <p className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: "#C4A882" }}>
+                  Photos
+                </p>
+                {photos.length > 0 && (
+                  <div className="grid grid-cols-3 gap-2 mb-4">
+                    {photos.map((p, i) => (
+                      <div key={i} className="relative aspect-square rounded-lg overflow-hidden">
+                        <img src={p} alt="" className="w-full h-full object-cover" />
+                        <button
+                          onClick={() => setPhotos(photos.filter((_, j) => j !== i))}
+                          className="absolute top-1 right-1 w-5 h-5 rounded-full text-xs flex items-center justify-center"
+                          style={{ backgroundColor: "rgba(0,0,0,0.5)", color: "#fff" }}
+                        >✕</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div className="grid grid-cols-2 divide-x" style={{ borderTop: "1px solid #e8e0d5" }}>
+                <label className="flex flex-col items-center gap-2 py-5 cursor-pointer hover:bg-stone-50 transition-colors">
+                  <span className="text-2xl">🖼</span>
+                  <span className="text-sm font-medium" style={{ color: "#8a8075" }}>Galerie</span>
+                  <span className="text-xs" style={{ color: "#c4b8aa" }}>{photos.length}/20</span>
+                  <input type="file" accept="image/*" multiple onChange={handlePhotoUpload} className="hidden" />
+                </label>
+                <label className="flex flex-col items-center gap-2 py-5 cursor-pointer hover:bg-stone-50 transition-colors">
+                  <span className="text-2xl">📷</span>
+                  <span className="text-sm font-medium" style={{ color: "#8a8075" }}>Caméra</span>
+                  <input type="file" accept="image/*" capture="environment" onChange={handlePhotoUpload} className="hidden" />
+                </label>
+              </div>
+            </div>
           </div>
         </div>
-
-        {/* Avis */}
-        <div className="bg-white rounded-2xl border border-stone-100 shadow-sm px-4 py-4">
-          <p className="text-[10px] font-semibold text-stone-400 uppercase tracking-widest mb-3">Ton avis</p>
-          <textarea
-            value={form.review}
-            onChange={(e) => setForm({ ...form, review: e.target.value })}
-            placeholder="Qu'est-ce qui t'a plu ? Qu'est-ce qui le rend spécial ?"
-            rows={4}
-            maxLength={1000}
-            className="w-full text-sm text-stone-700 placeholder-stone-300 bg-transparent outline-none resize-none leading-relaxed"
-          />
-          <p className="text-xs text-stone-300 text-right">{(form.review ?? "").length}/1000</p>
-        </div>
-
       </div>
     </div>
   );

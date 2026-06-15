@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Playfair_Display, DM_Sans } from "next/font/google";
 import "./globals.css";
-import { BottomNav } from "@/components/layout/BottomNav";
+import { Header } from "@/components/layout/Header";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -27,9 +27,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr" className={`${playfair.variable} ${dmSans.variable}`}>
-      <body className="bg-stone-50 text-stone-900 antialiased">
-        <main className="min-h-screen pb-20">{children}</main>
-        <BottomNav />
+      <body style={{ backgroundColor: "#f5f0eb", color: "#1a1a1a" }} className="antialiased">
+        <Header />
+        <main className="min-h-screen">{children}</main>
       </body>
     </html>
   );
