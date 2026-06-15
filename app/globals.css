@@ -82,29 +82,14 @@ h1, h2, h3 {
 ::-webkit-scrollbar-thumb { background: #C4A882; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #a8895f; }
 
-.sidebar-full-height {
-  height: 100%;
-  height: 100dvh;
-}
 
-.sidebar-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  bottom: env(safe-area-inset-bottom, 0px);
-  height: 100%;
-  height: -webkit-fill-available;
-}
 
 .sidebar-panel {
   position: fixed;
   top: 0;
   right: 0;
-  bottom: 0;
-  bottom: env(safe-area-inset-bottom, 0px);
-  height: 100%;
-  height: -webkit-fill-available;
   width: 18rem;
+  bottom: 0;
+  min-height: -webkit-fill-available;
+  background-color: #1a1a1a;
 }

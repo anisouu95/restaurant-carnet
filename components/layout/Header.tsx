@@ -113,14 +113,8 @@ export function Header() {
 
           {/* Sidebar */}
           <div
-            className="fixed z-50 flex flex-col sm:hidden sidebar-panel"
-            style={{
-              top: 0,
-              right: 0,
-              bottom: 0,
-              width: "18rem",
-              backgroundColor: "#1a1a1a",
-            }}
+            className="z-50 flex flex-col sm:hidden sidebar-panel"
+            style={{}}
           >
             <div className="flex items-center justify-between px-6 py-5" style={{ borderBottom: "1px solid #2a2a2a" }}>
               <span className="font-display text-lg font-bold" style={{ color: "#C4A882" }}>
