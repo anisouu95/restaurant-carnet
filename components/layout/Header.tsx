@@ -109,14 +109,14 @@ export function Header() {
       {/* Overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/50 sidebar-full-height"
+          className="fixed inset-0 z-40 bg-black/50"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
       <div
-        className="fixed top-0 right-0 w-72 z-50 flex flex-col transition-transform duration-300 sm:hidden sidebar-full-height"
+        className="fixed top-0 bottom-0 right-0 w-72 z-50 flex flex-col transition-transform duration-300 sm:hidden"
         style={{
           backgroundColor: "#1a1a1a",
           transform: sidebarOpen ? "translateX(0)" : "translateX(100%)",
