@@ -109,7 +109,7 @@ export function Header() {
       {/* Overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/50"
+          className="fixed inset-0 z-40 bg-black/50 sidebar-full-height"
           onClick={() => setSidebarOpen(false)}
         />
       )}
