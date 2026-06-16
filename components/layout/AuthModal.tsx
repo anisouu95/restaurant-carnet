@@ -12,7 +12,7 @@ export function AuthModal({ onClose }: AuthModalProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
-  const [username, setUsername] = useState("");
+  
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -36,7 +36,7 @@ export function AuthModal({ onClose }: AuthModalProps) {
           await supabase.from("profiles").insert({
             id: data.user.id,
             full_name: name,
-            username: username || email.split("@")[0],
+            
           });
         }
         onClose();
@@ -116,17 +116,7 @@ export function AuthModal({ onClose }: AuthModalProps) {
                   style={{ backgroundColor: "#f5f0eb", border: "1px solid #e8e0d5", color: "#1a1a1a" }}
                 />
               </div>
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold uppercase tracking-widest" style={{ color: "#8a8075" }}>Pseudo</label>
-                <input
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/\s/g, ""))}
-                  placeholder="ton_pseudo"
-                  className="w-full px-4 py-3 rounded-xl text-sm outline-none"
-                  style={{ backgroundColor: "#f5f0eb", border: "1px solid #e8e0d5", color: "#1a1a1a" }}
-                />
-              </div>
+
             </>
           )}
 
