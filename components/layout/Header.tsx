@@ -11,13 +11,22 @@ export function Header() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [profile, setProfile] = useState<any>(null);
+
+  async function fetchProfile(userId: string) {
+    const { data } = await supabase.from("profiles").select("username, full_name").eq("id", userId).single();
+    setProfile(data);
+  }
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
+      if (session?.user) fetchProfile(session.user.id);
     });
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
+      if (session?.user) fetchProfile(session.user.id);
+      else setProfile(null);
     });
     return () => subscription.unsubscribe();
   }, []);
@@ -61,6 +70,8 @@ export function Header() {
     },
   ];
 
+  const displayName = profile?.username || user?.email?.split("@")[0];
+
   return (
     <>
       <header style={{ backgroundColor: "#1a1a1a" }} className="sticky top-0 z-50">
@@ -103,9 +114,9 @@ export function Header() {
               >
                 <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
                   style={{ backgroundColor: "#C4A882", color: "#1a1a1a" }}>
-                  {user.email?.[0].toUpperCase()}
+                  {displayName?.[0].toUpperCase()}
                 </div>
-                <span className="hidden sm:block">{user.email?.split("@")[0]}</span>
+                <span className="hidden sm:block">{displayName}</span>
               </Link>
             ) : (
               <button
@@ -183,7 +194,7 @@ export function Header() {
                 >
                   <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
                     style={{ backgroundColor: "#C4A882", color: "#1a1a1a" }}>
-                    {user.email?.[0].toUpperCase()}
+                    {displayName?.[0].toUpperCase()}
                   </div>
                   Mon profil
                 </Link>
