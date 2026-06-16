@@ -14,7 +14,7 @@ export function Header() {
   const [profile, setProfile] = useState<any>(null);
 
   async function fetchProfile(userId: string) {
-    const { data } = await supabase.from("profiles").select("username, full_name").eq("id", userId).single();
+    const { data } = await supabase.from("profiles").select("full_name").eq("id", userId).single();
     setProfile(data);
   }
 
@@ -70,7 +70,7 @@ export function Header() {
     },
   ];
 
-  const displayName = profile?.username || user?.email?.split("@")[0];
+  const displayName = profile?.full_name || user?.email?.split("@")[0];
 
   return (
     <>
