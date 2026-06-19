@@ -14,7 +14,7 @@ export function Header() {
   const [profile, setProfile] = useState<any>(null);
 
   async function fetchProfile(userId: string) {
-    const { data } = await supabase.from("profiles").select("full_name").eq("id", userId).single();
+    const { data } = await supabase.from("profiles").select("full_name, avatar_url").eq("id", userId).single();
     setProfile(data);
   }
 
@@ -112,9 +112,13 @@ export function Header() {
                 className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-all"
                 style={{ backgroundColor: "#2a2a2a", color: "#C4A882" }}
               >
-                <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
+                <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold overflow-hidden"
                   style={{ backgroundColor: "#C4A882", color: "#1a1a1a" }}>
-                  {displayName?.[0].toUpperCase()}
+                  {profile?.avatar_url ? (
+                    <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    displayName?.[0]?.toUpperCase()
+                  )}
                 </div>
                 <span className="hidden sm:block">{displayName}</span>
               </Link>
@@ -192,9 +196,13 @@ export function Header() {
                   className="flex items-center gap-4 px-4 py-3 rounded-xl text-sm font-medium transition-all mt-4"
                   style={{ backgroundColor: "#2a2a2a", color: "#C4A882" }}
                 >
-                  <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
+                  <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold overflow-hidden"
                     style={{ backgroundColor: "#C4A882", color: "#1a1a1a" }}>
-                    {displayName?.[0].toUpperCase()}
+                    {profile?.avatar_url ? (
+                      <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      displayName?.[0]?.toUpperCase()
+                    )}
                   </div>
                   Mon profil
                 </Link>
