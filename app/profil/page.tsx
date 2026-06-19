@@ -11,6 +11,8 @@ export default function ProfilPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
   const [bioFlash, setBioFlash] = useState("");
   const [cuisineInput, setCuisineInput] = useState("");
@@ -29,6 +31,7 @@ export default function ProfilPage() {
       setTopCuisines(data?.top_cuisines || []);
       setIngredients(data?.signature_ingredients || []);
       setUltimateTest(data?.ultimate_test || "");
+      setAvatarUrl(data?.avatar_url || null);
       setIsLoading(false);
     });
   }, []);
@@ -55,6 +58,26 @@ export default function ProfilPage() {
 
   function removeIngredient(tag: string) {
     setIngredients(ingredients.filter((t) => t !== tag));
+  }
+
+  async function handleAvatarUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+
+    setIsUploading(true);
+    const fileExt = file.name.split('.').pop();
+    const filePath = `${user.id}/avatar.${fileExt}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('avatars')
+      .upload(filePath, file, { upsert: true });
+
+      const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
+      const newUrl = `${urlData.publicUrl}?t=${Date.now()}`;
+      await supabase.from('profiles').update({ avatar_url: newUrl }).eq('id', user.id);
+      setAvatarUrl(newUrl);
+    }
+    setIsUploading(false);
   }
 
   async function handleSave() {
@@ -126,7 +149,7 @@ export default function ProfilPage() {
 
           {/* Bio Flash */}
           <div className="mb-5">
-            <p className="text-xs font-medium mb-2" style={{ color: "#8a8075" }}>Bio flash</p>
+            <p className="text-xs font-medium mb-2" style={{ color: "#8a8075" }}>Bio</p>
             {isEditing ? (
               <input
                 type="text"
@@ -243,9 +266,11 @@ export default function ProfilPage() {
             <div className="flex items-center gap-1.5 mb-2">
               <p className="text-xs font-medium" style={{ color: "#8a8075" }}>Le test ultime 🍮</p>
             </div>
-            <p className="text-xs mb-2 leading-relaxed" style={{ color: "#a89c8c" }}>
-              Le plat témoin que tu commandes toujours pour juger un restaurant — celui qui te permet de savoir s'il vaut le coup en une bouchée.
-            </p>
+            {isEditing && (
+              <p className="text-xs mb-2 leading-relaxed" style={{ color: "#a89c8c" }}>
+                Le plat témoin que tu commandes toujours pour juger un restaurant — celui qui te permet de savoir s'il vaut le coup en une bouchée.
+              </p>
+            )}
             {isEditing ? (
               <input
                 type="text"
