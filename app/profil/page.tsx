@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { CUISINE_TYPES } from "@/lib/types";
 
 export default function ProfilPage() {
   const router = useRouter();
@@ -13,8 +12,8 @@ export default function ProfilPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  // Champs éditables
   const [bioFlash, setBioFlash] = useState("");
+  const [cuisineInput, setCuisineInput] = useState("");
   const [topCuisines, setTopCuisines] = useState<string[]>([]);
   const [ingredientInput, setIngredientInput] = useState("");
   const [ingredients, setIngredients] = useState<string[]>([]);
@@ -34,12 +33,16 @@ export default function ProfilPage() {
     });
   }, []);
 
-  function toggleCuisine(c: string) {
-    if (topCuisines.includes(c)) {
-      setTopCuisines(topCuisines.filter((x) => x !== c));
-    } else if (topCuisines.length < 3) {
-      setTopCuisines([...topCuisines, c]);
+  function addCuisine() {
+    const val = cuisineInput.trim();
+    if (val && !topCuisines.includes(val) && topCuisines.length < 3) {
+      setTopCuisines([...topCuisines, val]);
     }
+    setCuisineInput("");
+  }
+
+  function removeCuisine(c: string) {
+    setTopCuisines(topCuisines.filter((x) => x !== c));
   }
 
   function addIngredient() {
@@ -86,7 +89,6 @@ export default function ProfilPage() {
     <div className="min-h-screen px-4 sm:px-10 py-8 pb-16" style={{ backgroundColor: "#f5f0eb" }}>
       <div className="max-w-lg mx-auto">
 
-        {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
             <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: "#C4A882" }}>Mon compte</p>
@@ -103,7 +105,6 @@ export default function ProfilPage() {
           )}
         </div>
 
-        {/* Avatar + nom */}
         <div className="rounded-2xl p-6 mb-4 flex items-center gap-5"
           style={{ backgroundColor: "#ffffff", border: "1px solid #e8e0d5" }}>
           <div className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold flex-shrink-0"
@@ -118,7 +119,6 @@ export default function ProfilPage() {
           </div>
         </div>
 
-        {/* Carte de visite gourmande */}
         <div className="rounded-2xl p-6 mb-4" style={{ backgroundColor: "#ffffff", border: "1px solid #e8e0d5" }}>
           <p className="text-xs font-semibold uppercase tracking-widest mb-5" style={{ color: "#C4A882" }}>
             Carte de visite gourmande
@@ -144,7 +144,7 @@ export default function ProfilPage() {
             )}
           </div>
 
-          {/* Top 3 Cuisines */}
+          {/* Top 3 Cuisines - champ libre */}
           <div className="mb-5">
             <div className="flex items-center justify-between mb-2">
               <p className="text-xs font-medium" style={{ color: "#8a8075" }}>Top 3 des cuisines</p>
@@ -152,33 +152,28 @@ export default function ProfilPage() {
                 <p className="text-xs" style={{ color: "#C4A882" }}>{topCuisines.length}/3</p>
               )}
             </div>
-            {isEditing ? (
-              <div className="flex flex-wrap gap-2">
-                {CUISINE_TYPES.map((c) => {
-                  const selected = topCuisines.includes(c);
-                  const rank = topCuisines.indexOf(c) + 1;
-                  const disabled = !selected && topCuisines.length >= 3;
-                  return (
-                    <button
-                      key={c}
-                      type="button"
-                      disabled={disabled}
-                      onClick={() => toggleCuisine(c)}
-                      className="px-3 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5"
-                      style={{
-                        backgroundColor: selected ? "#1a1a1a" : "transparent",
-                        color: selected ? "#f5f0eb" : disabled ? "#d4cdc2" : "#8a8075",
-                        border: `1px solid ${selected ? "#1a1a1a" : "#e8e0d5"}`,
-                        opacity: disabled ? 0.5 : 1,
-                      }}
-                    >
-                      {selected && <span style={{ color: "#C4A882" }}>#{rank}</span>}
-                      {c}
-                    </button>
-                  );
-                })}
+            {isEditing && topCuisines.length < 3 && (
+              <div className="flex gap-2 mb-3">
+                <input
+                  type="text"
+                  value={cuisineInput}
+                  onChange={(e) => setCuisineInput(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addCuisine(); } }}
+                  placeholder="Ex : Péruvienne"
+                  className="flex-1 px-4 py-3 rounded-xl text-sm outline-none"
+                  style={{ backgroundColor: "#f5f0eb", border: "1px solid #e8e0d5", color: "#1a1a1a" }}
+                />
+                <button
+                  type="button"
+                  onClick={addCuisine}
+                  className="px-4 rounded-xl text-sm font-bold"
+                  style={{ backgroundColor: "#1a1a1a", color: "#f5f0eb" }}
+                >
+                  +
+                </button>
               </div>
-            ) : topCuisines.length > 0 ? (
+            )}
+            {topCuisines.length > 0 ? (
               <div className="flex flex-wrap gap-2">
                 {topCuisines.map((c, i) => (
                   <span
@@ -188,6 +183,9 @@ export default function ProfilPage() {
                   >
                     <span style={{ color: "#C4A882" }}>#{i + 1}</span>
                     {c}
+                    {isEditing && (
+                      <button onClick={() => removeCuisine(c)} className="text-xs ml-1">✕</button>
+                    )}
                   </span>
                 ))}
               </div>
@@ -240,9 +238,14 @@ export default function ProfilPage() {
             )}
           </div>
 
-          {/* Test Ultime */}
+          {/* Test Ultime avec explication */}
           <div>
-            <p className="text-xs font-medium mb-2" style={{ color: "#8a8075" }}>Le test ultime 🍮</p>
+            <div className="flex items-center gap-1.5 mb-2">
+              <p className="text-xs font-medium" style={{ color: "#8a8075" }}>Le test ultime 🍮</p>
+            </div>
+            <p className="text-xs mb-2 leading-relaxed" style={{ color: "#a89c8c" }}>
+              Le plat témoin que tu commandes toujours pour juger un restaurant — celui qui te permet de savoir s'il vaut le coup en une bouchée.
+            </p>
             {isEditing ? (
               <input
                 type="text"
@@ -260,7 +263,6 @@ export default function ProfilPage() {
           </div>
         </div>
 
-        {/* Boutons édition */}
         {isEditing && (
           <div className="flex gap-3 mb-4">
             <button
@@ -281,7 +283,6 @@ export default function ProfilPage() {
           </div>
         )}
 
-        {/* Déconnexion */}
         {!isEditing && (
           <button
             onClick={handleLogout}
