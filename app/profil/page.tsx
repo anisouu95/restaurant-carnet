@@ -65,16 +65,17 @@ export default function ProfilPage() {
     if (!file || !user) return;
 
     setIsUploading(true);
-    const fileExt = file.name.split('.').pop();
+    const fileExt = file.name.split(".").pop();
     const filePath = `${user.id}/avatar.${fileExt}`;
 
     const { error: uploadError } = await supabase.storage
-      .from('avatars')
+      .from("avatars")
       .upload(filePath, file, { upsert: true });
 
-      const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
+    if (!uploadError) {
+      const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(filePath);
       const newUrl = `${urlData.publicUrl}?t=${Date.now()}`;
-      await supabase.from('profiles').update({ avatar_url: newUrl }).eq('id', user.id);
+      await supabase.from("profiles").update({ avatar_url: newUrl }).eq("id", user.id);
       setAvatarUrl(newUrl);
     }
     setIsUploading(false);
@@ -130,10 +131,19 @@ export default function ProfilPage() {
 
         <div className="rounded-2xl p-6 mb-4 flex items-center gap-5"
           style={{ backgroundColor: "#ffffff", border: "1px solid #e8e0d5" }}>
-          <div className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold flex-shrink-0"
+          <label className="relative w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold flex-shrink-0 overflow-hidden cursor-pointer"
             style={{ backgroundColor: "#C4A882", color: "#1a1a1a" }}>
-            {(profile?.full_name || user?.email)?.[0].toUpperCase()}
-          </div>
+            {avatarUrl ? (
+              <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+            ) : (
+              (profile?.full_name || user?.email)?.[0].toUpperCase()
+            )}
+            <div className="absolute inset-0 flex items-center justify-center text-white text-xs font-medium opacity-0 hover:opacity-100 transition-opacity"
+              style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
+              {isUploading ? "…" : "Modifier"}
+            </div>
+            <input type="file" accept="image/*" onChange={handleAvatarUpload} className="hidden" disabled={isUploading} />
+          </label>
           <div>
             <p className="font-display text-xl font-semibold" style={{ color: "#1a1a1a" }}>
               {profile?.full_name || user?.email?.split("@")[0]}
@@ -147,7 +157,6 @@ export default function ProfilPage() {
             Carte de visite gourmande
           </p>
 
-          {/* Bio Flash */}
           <div className="mb-5">
             <p className="text-xs font-medium mb-2" style={{ color: "#8a8075" }}>Bio</p>
             {isEditing ? (
@@ -167,7 +176,6 @@ export default function ProfilPage() {
             )}
           </div>
 
-          {/* Top 3 Cuisines - champ libre */}
           <div className="mb-5">
             <div className="flex items-center justify-between mb-2">
               <p className="text-xs font-medium" style={{ color: "#8a8075" }}>Top 3 des cuisines</p>
@@ -217,7 +225,6 @@ export default function ProfilPage() {
             )}
           </div>
 
-          {/* Ingrédients fétiches */}
           <div className="mb-5">
             <p className="text-xs font-medium mb-2" style={{ color: "#8a8075" }}>Ingrédients fétiches</p>
             {isEditing && (
@@ -261,7 +268,6 @@ export default function ProfilPage() {
             )}
           </div>
 
-          {/* Test Ultime avec explication */}
           <div>
             <div className="flex items-center gap-1.5 mb-2">
               <p className="text-xs font-medium" style={{ color: "#8a8075" }}>Le test ultime 🍮</p>
